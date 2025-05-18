@@ -172,7 +172,7 @@ export function LinksDropdown(props: { children: React.ReactNode }) {
             />
             <CircleDropdownLink href="/support" icon={Icons.SUPPORT} />
             <CircleDropdownLink
-              href="Coming Soon!"
+              href="https://www.google.com/search?q=coming+soon"
               icon={Icons.TIP_JAR}
             />
           </div>
