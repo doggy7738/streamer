@@ -77,6 +77,7 @@ export function Footer() {
             {t("footer.links.discord")}
           </FooterLink>
           <FooterLink href="https://www.google.com/search?q=coming+soon" icon={Icons.TIP_JAR}>
+
             {t("footer.links.funding")}
           </FooterLink>
           <div className="inline md:hidden">
