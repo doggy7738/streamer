@@ -1,9 +1,9 @@
 {
   "packageManager": "pnpm@9.14.4",
-  "name": "P-Stream",
+  "name": "Preston Code Movies",
   "version": "4.9.7",
   "private": true,
-  "homepage": "https://github.com/p-stream/p-stream",
+  "homepage": "https://github.com/doggy7738/streamer",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
