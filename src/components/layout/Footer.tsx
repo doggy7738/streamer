@@ -76,10 +76,6 @@ export function Footer() {
           <FooterLink icon={Icons.DISCORD} href={conf().DISCORD_LINK}>
             {t("footer.links.discord")}
           </FooterLink>
-          <FooterLink href="https://www.google.com/search?q=coming+soon" icon={Icons.TIP_JAR}>
-"prettier/prettier"
-            {t("footer.links.funding")}
-          </FooterLink>
           <div className="inline md:hidden">
             <Dmca />
           </div>
