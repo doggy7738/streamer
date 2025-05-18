@@ -214,7 +214,7 @@ export function HeroPart({ setIsSticky, searchParams }: HeroPartProps) {
                   <div>
                     <p className="text-xs text-type-dimmed text-center pt-2 mx-4">
                       <a
-                        href="https://discord.gg/mcjnJK98Gd"
+                        href="https://discord.gg/WAEVQ2C2Jk"
                         target="_blank"
                         rel="noreferrer"
                       >

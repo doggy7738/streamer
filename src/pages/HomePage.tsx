@@ -178,12 +178,12 @@ export function HomePage() {
               transition! If you have questions or need help, feel free to reach
               out on the{" "}
               <a
-                href="https://discord.com/invite/7z6znYgrTG"
+                href="https://discord.gg/WAEVQ2C2Jk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-type-link"
               >
-                P-Stream Discord
+                Preston Code Discord
               </a>
               !
             </p>
