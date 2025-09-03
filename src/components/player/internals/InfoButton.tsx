@@ -1,19 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Icons } from "@/components/Icon";
-import { DetailsModal } from "@/components/overlays/DetailsModal";
+import { DetailsModal } from "@/components/overlays/detailsModal";
 import { useModal } from "@/components/overlays/Modal";
 import { usePlayerStore } from "@/stores/player/store";
+import { usePreferencesStore } from "@/stores/preferences";
 
 import { VideoPlayerButton } from "./Button";
 
 export function InfoButton() {
   const meta = usePlayerStore((s) => s.meta);
   const modal = useModal("player-details");
+  const setHasOpenOverlay = usePlayerStore((s) => s.setHasOpenOverlay);
   const [detailsData, setDetailsData] = useState<{
     id: number;
     type: "movie" | "show";
   } | null>(null);
+
+  useEffect(() => {
+    setHasOpenOverlay(modal.isShown);
+  }, [setHasOpenOverlay, modal.isShown]);
 
   const handleClick = async () => {
     if (!meta?.tmdbId) return;
@@ -24,6 +30,14 @@ export function InfoButton() {
     });
     modal.show();
   };
+
+  const enableLowPerformanceMode = usePreferencesStore(
+    (state) => state.enableLowPerformanceMode,
+  );
+
+  if (enableLowPerformanceMode) {
+    return null;
+  }
 
   return (
     <>

@@ -7,15 +7,15 @@ import { Icons } from "@/components/Icon";
 import { OverlayPortal } from "@/components/overlays/OverlayDisplay";
 import { Flare } from "@/components/utils/Flare";
 import { Heading2 } from "@/components/utils/Text";
-import { useQueryParam } from "@/hooks/useQueryParams";
+import { useOverlayStack } from "@/stores/interface/overlayStack";
 
 export function useModal(id: string) {
-  const [currentModal, setCurrentModal] = useQueryParam("m");
-  const show = useCallback(() => setCurrentModal(id), [id, setCurrentModal]);
-  const hide = useCallback(() => setCurrentModal(null), [setCurrentModal]);
+  const { showModal, hideModal, isModalVisible } = useOverlayStack();
+  const show = useCallback(() => showModal(id), [id, showModal]);
+  const hide = useCallback(() => hideModal(id), [id, hideModal]);
   return {
     id,
-    isShown: currentModal === id,
+    isShown: isModalVisible(id),
     show,
     hide,
   };
@@ -33,9 +33,17 @@ export function ModalCard(props: { children?: ReactNode }) {
 
 export function Modal(props: { id: string; children?: ReactNode }) {
   const modal = useModal(props.id);
+  const { modalStack } = useOverlayStack();
+  const modalIndex = modalStack.indexOf(props.id);
+  const zIndex = modalIndex >= 0 ? 1000 + modalIndex : 999;
 
   return (
-    <OverlayPortal darken close={modal.hide} show={modal.isShown}>
+    <OverlayPortal
+      darken
+      close={modal.hide}
+      show={modal.isShown}
+      zIndex={zIndex}
+    >
       <Helmet>
         <html data-no-scroll />
       </Helmet>
@@ -50,7 +58,7 @@ export function FancyModal(props: {
   id: string;
   children?: ReactNode;
   title?: string;
-  size?: "md" | "xl";
+  size?: "md" | "lg" | "xl";
   oneTime?: boolean;
 }) {
   const modal = useModal(props.id);
@@ -82,6 +90,7 @@ export function FancyModal(props: {
             "group -m-[0.705em] rounded-3xl bg-background-main transition-colors duration-300 focus:relative focus:z-10",
             "w-full mx-4 p-6 bg-mediaCard-hoverBackground bg-opacity-60 backdrop-filter backdrop-blur-lg shadow-lg",
             props.size === "md" ? "max-w-md" : "max-w-2xl",
+            props.size === "xl" ? "max-w-7xl" : "max-w-2xl",
           )}
         >
           <div className="transition-transform duration-300 overflow-y-scroll max-h-[90dvh] scrollbar-none">

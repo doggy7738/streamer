@@ -79,7 +79,6 @@ export function useWatchPartySync(
   const display = usePlayerStore((s) => s.display);
   const currentTime = usePlayerStore((s) => s.progress.time);
   const isPlaying = usePlayerStore((s) => s.mediaPlaying.isPlaying);
-
   // Get watch party state
   const { roomCode, isHost, enabled, enableAsGuest } = useWatchPartyStore();
 
@@ -91,7 +90,7 @@ export function useWatchPartySync(
       const params = new URLSearchParams(window.location.search);
       const watchPartyCode = params.get("watchparty");
 
-      if (watchPartyCode && !enabled && watchPartyCode.length === 4) {
+      if (watchPartyCode && !enabled && watchPartyCode.length > 0) {
         enableAsGuest(watchPartyCode);
       }
 
@@ -184,7 +183,7 @@ export function useWatchPartySync(
       state.syncInProgress = true;
       setIsSyncing(true);
 
-      // Sync time first
+      // Sync time
       display.setTime(predictedHostTime);
 
       // Then sync play state after a short delay

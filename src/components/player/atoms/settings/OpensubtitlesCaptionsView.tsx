@@ -27,6 +27,7 @@ export function OpenSubtitlesCaptionView({
   const { selectCaptionById } = useCaptions();
   const captionList = usePlayerStore((s) => s.captionList);
   const getHlsCaptionList = usePlayerStore((s) => s.display?.getCaptionList);
+  const addExternalSubtitles = usePlayerStore((s) => s.addExternalSubtitles);
 
   const captions = useMemo(
     () =>
@@ -48,6 +49,10 @@ export function OpenSubtitlesCaptionView({
     [selectCaptionById, setCurrentlyDownloading],
   );
 
+  const [refreshReq, startRefresh] = useAsyncFn(async () => {
+    return addExternalSubtitles();
+  }, [addExternalSubtitles]);
+
   const content = subtitleList.length
     ? subtitleList.map((v) => {
         return (
@@ -64,6 +69,12 @@ export function OpenSubtitlesCaptionView({
             }
             onClick={() => startDownload(v.id)}
             flag
+            subtitleUrl={v.url}
+            subtitleType={v.type}
+            // subtitle details from wyzie
+            subtitleSource={v.source}
+            subtitleEncoding={v.encoding}
+            isHearingImpaired={v.isHearingImpaired}
           >
             {v.languageName}
           </CaptionOption>
@@ -92,6 +103,14 @@ export function OpenSubtitlesCaptionView({
           <div className="p-4 rounded-xl bg-video-context-light bg-opacity-10 font-medium text-center">
             <div className="flex flex-col items-center justify-center gap-3">
               {t("player.menus.subtitles.empty")}
+              <button
+                type="button"
+                onClick={() => startRefresh()}
+                disabled={refreshReq.loading}
+                className="p-1 w-3/4 rounded tabbable duration-200 bg-opacity-10 bg-video-context-light hover:bg-opacity-20"
+              >
+                {t("player.menus.subtitles.scrapeButton")}
+              </button>
             </div>
           </div>
         ) : (

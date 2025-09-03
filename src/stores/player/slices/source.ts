@@ -1,4 +1,5 @@
-import { ScrapeMedia } from "@movie-web/providers";
+/* eslint-disable no-console */
+import { ScrapeMedia } from "@p-stream/providers";
 
 import { MakeSlice } from "@/stores/player/slices/types";
 import {
@@ -11,6 +12,7 @@ import { ValuesOf } from "@/utils/typeguard";
 
 export const playerStatus = {
   IDLE: "idle",
+  RESUME: "resume",
   SCRAPING: "scraping",
   PLAYING: "playing",
   SCRAPE_NOT_FOUND: "scrapeNotFound",
@@ -53,9 +55,16 @@ export interface CaptionListItem {
   id: string;
   language: string;
   url: string;
+  type?: string;
   needsProxy: boolean;
   hls?: boolean;
   opensubtitles?: boolean;
+  // subtitle details from wyzie
+  display?: string;
+  media?: string;
+  isHearingImpaired?: boolean;
+  source?: string;
+  encoding?: string;
 }
 
 export interface AudioTrack {
@@ -68,6 +77,7 @@ export interface SourceSlice {
   status: PlayerStatus;
   source: SourceSliceSource | null;
   sourceId: string | null;
+  embedId: string | null;
   qualities: SourceQuality[];
   audioTracks: AudioTrack[];
   currentQuality: SourceQuality | null;
@@ -88,8 +98,11 @@ export interface SourceSlice {
   setMeta(meta: PlayerMeta, status?: PlayerStatus): void;
   setCaption(caption: Caption | null): void;
   setSourceId(id: string | null): void;
+  setEmbedId(id: string | null): void;
   enableAutomaticQuality(): void;
   redisplaySource(startAt: number): void;
+  setCaptionAsTrack(asTrack: boolean): void;
+  addExternalSubtitles(): Promise<void>;
 }
 
 export function metaToScrapeMedia(meta: PlayerMeta): ScrapeMedia {
@@ -118,6 +131,7 @@ export function metaToScrapeMedia(meta: PlayerMeta): ScrapeMedia {
 export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
   source: null,
   sourceId: null,
+  embedId: null,
   qualities: [],
   audioTracks: [],
   captionList: [],
@@ -133,6 +147,11 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
     set((s) => {
       s.status = playerStatus.PLAYING;
       s.sourceId = id;
+    });
+  },
+  setEmbedId(id) {
+    set((s) => {
+      s.embedId = id;
     });
   },
   setStatus(status: PlayerStatus) {
@@ -176,6 +195,12 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
     });
     const store = get();
     store.redisplaySource(startAt);
+
+    // Trigger external subtitle scraping after stream is loaded
+    // This runs asynchronously so it doesn't block the stream loading
+    setTimeout(() => {
+      store.addExternalSubtitles();
+    }, 100);
   },
   redisplaySource(startAt: number) {
     const store = get();
@@ -221,5 +246,35 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
   enableAutomaticQuality() {
     const store = get();
     store.display?.changeQuality(true, null);
+  },
+  setCaptionAsTrack(asTrack: boolean) {
+    set((s) => {
+      s.caption.asTrack = asTrack;
+    });
+  },
+  async addExternalSubtitles() {
+    const store = get();
+    if (!store.meta) return;
+
+    try {
+      const { scrapeExternalSubtitles } = await import(
+        "@/utils/externalSubtitles"
+      );
+      const externalCaptions = await scrapeExternalSubtitles(store.meta);
+
+      if (externalCaptions.length > 0) {
+        set((s) => {
+          // Add external captions to the existing list, avoiding duplicates
+          const existingIds = new Set(s.captionList.map((c) => c.id));
+          const newCaptions = externalCaptions.filter(
+            (c) => !existingIds.has(c.id),
+          );
+          s.captionList = [...s.captionList, ...newCaptions];
+        });
+        console.log(`Added ${externalCaptions.length} external captions`);
+      }
+    } catch (error) {
+      console.error("Failed to scrape external subtitles:", error);
+    }
   },
 });

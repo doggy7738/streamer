@@ -2,7 +2,7 @@ import {
   APP_VERSION,
   BACKEND_URL,
   DISCORD_LINK,
-  GITHUB_LINK,
+  // GITHUB_LINK,
   TWITTER_LINK,
 } from "./constants";
 
@@ -26,9 +26,12 @@ interface Config {
   ONBOARDING_PROXY_INSTALL_LINK: string;
   ALLOW_AUTOPLAY: boolean;
   ALLOW_FEBBOX_KEY: boolean;
+  ALLOW_REAL_DEBRID_KEY: boolean;
   SHOW_AD: boolean;
   AD_CONTENT_URL: string;
   TRACK_SCRIPT: string;
+  BANNER_MESSAGE: string;
+  BANNER_ID: string;
 }
 
 export interface RuntimeConfig {
@@ -38,6 +41,7 @@ export interface RuntimeConfig {
   DMCA_EMAIL: string | null;
   TWITTER_LINK: string;
   TMDB_READ_API_KEY: string | null;
+  ALLOW_REAL_DEBRID_KEY: boolean;
   NORMAL_ROUTER: boolean;
   PROXY_URLS: string[];
   M3U8_PROXY_URLS: string[];
@@ -54,6 +58,8 @@ export interface RuntimeConfig {
   SHOW_AD: boolean;
   AD_CONTENT_URL: string[];
   TRACK_SCRIPT: string | null;
+  BANNER_MESSAGE: string | null;
+  BANNER_ID: string | null;
 }
 
 const env: Record<keyof Config, undefined | string> = {
@@ -79,9 +85,12 @@ const env: Record<keyof Config, undefined | string> = {
   HAS_ONBOARDING: import.meta.env.VITE_HAS_ONBOARDING,
   ALLOW_AUTOPLAY: import.meta.env.VITE_ALLOW_AUTOPLAY,
   ALLOW_FEBBOX_KEY: import.meta.env.VITE_ALLOW_FEBBOX_KEY,
+  ALLOW_REAL_DEBRID_KEY: import.meta.env.VITE_ALLOW_REAL_DEBRID_KEY,
   SHOW_AD: import.meta.env.VITE_SHOW_AD,
   AD_CONTENT_URL: import.meta.env.VITE_AD_CONTENT_URL,
   TRACK_SCRIPT: import.meta.env.VITE_TRACK_SCRIPT,
+  BANNER_MESSAGE: import.meta.env.VITE_BANNER_MESSAGE,
+  BANNER_ID: import.meta.env.VITE_BANNER_ID,
 };
 
 function coerceUndefined(value: string | null | undefined): string | undefined {
@@ -106,17 +115,17 @@ function getKey(key: keyof Config, defaultString?: string): string | null {
 export function conf(): RuntimeConfig {
   return {
     APP_VERSION,
-    GITHUB_LINK,
+    GITHUB_LINK: getKey("GITHUB_LINK", ""),
     DISCORD_LINK,
     TWITTER_LINK,
     DMCA_EMAIL: getKey("DMCA_EMAIL"),
     ONBOARDING_CHROME_EXTENSION_INSTALL_LINK: getKey(
       "ONBOARDING_CHROME_EXTENSION_INSTALL_LINK",
-      "https://docs.pstream.org/extension",
+      "https://docs.pstream.mov/extension",
     ),
     ONBOARDING_FIREFOX_EXTENSION_INSTALL_LINK: getKey(
       "ONBOARDING_FIREFOX_EXTENSION_INSTALL_LINK",
-      "https://docs.pstream.org/extension",
+      "https://docs.pstream.mov/extension",
     ),
     ONBOARDING_PROXY_INSTALL_LINK: getKey("ONBOARDING_PROXY_INSTALL_LINK"),
     BACKEND_URL: getKey("BACKEND_URL", BACKEND_URL),
@@ -147,11 +156,14 @@ export function conf(): RuntimeConfig {
       )
       .filter((v) => v.length === 2), // The format is <beforeA>:<afterA>,<beforeB>:<afterB>
     ALLOW_FEBBOX_KEY: getKey("ALLOW_FEBBOX_KEY", "false") === "true",
+    ALLOW_REAL_DEBRID_KEY: getKey("ALLOW_REAL_DEBRID_KEY", "false") === "true",
     SHOW_AD: getKey("SHOW_AD", "false") === "true",
     AD_CONTENT_URL: getKey("AD_CONTENT_URL", "")
       .split(",")
       .map((v) => v.trim())
       .filter((v) => v.length > 0),
     TRACK_SCRIPT: getKey("TRACK_SCRIPT"),
+    BANNER_MESSAGE: getKey("BANNER_MESSAGE"),
+    BANNER_ID: getKey("BANNER_ID"),
   };
 }

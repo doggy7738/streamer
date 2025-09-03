@@ -131,8 +131,11 @@ export function SettingsPage() {
   const backendUrlSetting = useAuthStore((s) => s.backendUrl);
   const setBackendUrl = useAuthStore((s) => s.setBackendUrl);
 
-  const febboxToken = useAuthStore((s) => s.febboxToken);
-  const setFebboxToken = useAuthStore((s) => s.setFebboxToken);
+  const febboxKey = usePreferencesStore((s) => s.febboxKey);
+  const setFebboxKey = usePreferencesStore((s) => s.setFebboxKey);
+
+  const realDebridKey = usePreferencesStore((s) => s.realDebridKey);
+  const setRealDebridKey = usePreferencesStore((s) => s.setRealDebridKey);
 
   const enableThumbnails = usePreferencesStore((s) => s.enableThumbnails);
   const setEnableThumbnails = usePreferencesStore((s) => s.setEnableThumbnails);
@@ -148,21 +151,46 @@ export function SettingsPage() {
   const sourceOrder = usePreferencesStore((s) => s.sourceOrder);
   const setSourceOrder = usePreferencesStore((s) => s.setSourceOrder);
 
+  const enableSourceOrder = usePreferencesStore((s) => s.enableSourceOrder);
+  const setEnableSourceOrder = usePreferencesStore(
+    (s) => s.setEnableSourceOrder,
+  );
+
   const enableDiscover = usePreferencesStore((s) => s.enableDiscover);
   const setEnableDiscover = usePreferencesStore((s) => s.setEnableDiscover);
+
+  const enableFeatured = usePreferencesStore((s) => s.enableFeatured);
+  const setEnableFeatured = usePreferencesStore((s) => s.setEnableFeatured);
 
   const enableDetailsModal = usePreferencesStore((s) => s.enableDetailsModal);
   const setEnableDetailsModal = usePreferencesStore(
     (s) => s.setEnableDetailsModal,
   );
 
-  const enableSourceOrder = usePreferencesStore((s) => s.enableSourceOrder);
-  const setEnableSourceOrder = usePreferencesStore(
-    (s) => s.setEnableSourceOrder,
-  );
+  const enableImageLogos = usePreferencesStore((s) => s.enableImageLogos);
+  const setEnableImageLogos = usePreferencesStore((s) => s.setEnableImageLogos);
 
   const proxyTmdb = usePreferencesStore((s) => s.proxyTmdb);
   const setProxyTmdb = usePreferencesStore((s) => s.setProxyTmdb);
+
+  const enableCarouselView = usePreferencesStore((s) => s.enableCarouselView);
+  const setEnableCarouselView = usePreferencesStore(
+    (s) => s.setEnableCarouselView,
+  );
+
+  const forceCompactEpisodeView = usePreferencesStore(
+    (s) => s.forceCompactEpisodeView,
+  );
+  const setForceCompactEpisodeView = usePreferencesStore(
+    (s) => s.setForceCompactEpisodeView,
+  );
+
+  const enableLowPerformanceMode = usePreferencesStore(
+    (s) => s.enableLowPerformanceMode,
+  );
+  const setEnableLowPerformanceMode = usePreferencesStore(
+    (s) => s.setEnableLowPerformanceMode,
+  );
 
   const account = useAuthStore((s) => s.account);
   const updateProfile = useAuthStore((s) => s.setAccountProfile);
@@ -182,12 +210,15 @@ export function SettingsPage() {
       if (account && backendUrl) {
         const settings = await getSettings(backendUrl, account);
         if (settings.febboxKey) {
-          setFebboxToken(settings.febboxKey);
+          setFebboxKey(settings.febboxKey);
+        }
+        if (settings.realDebridKey) {
+          setRealDebridKey(settings.realDebridKey);
         }
       }
     };
     loadSettings();
-  }, [account, backendUrl, setFebboxToken]);
+  }, [account, backendUrl, setFebboxKey, setRealDebridKey]);
 
   const state = useSettingsState(
     activeTheme,
@@ -196,16 +227,22 @@ export function SettingsPage() {
     decryptedName,
     proxySet,
     backendUrlSetting,
-    febboxToken,
+    febboxKey,
+    realDebridKey,
     account ? account.profile : undefined,
     enableThumbnails,
     enableAutoplay,
     enableDiscover,
+    enableFeatured,
     enableDetailsModal,
     sourceOrder,
     enableSourceOrder,
     proxyTmdb,
     enableSkipCredits,
+    enableImageLogos,
+    enableCarouselView,
+    forceCompactEpisodeView,
+    enableLowPerformanceMode,
   );
 
   const availableSources = useMemo(() => {
@@ -249,13 +286,41 @@ export function SettingsPage() {
         state.appLanguage.changed ||
         state.theme.changed ||
         state.proxyUrls.changed ||
-        state.febboxToken.changed
+        state.febboxKey.changed ||
+        state.realDebridKey.changed ||
+        state.enableThumbnails.changed ||
+        state.enableAutoplay.changed ||
+        state.enableSkipCredits.changed ||
+        state.enableDiscover.changed ||
+        state.enableFeatured.changed ||
+        state.enableDetailsModal.changed ||
+        state.enableImageLogos.changed ||
+        state.sourceOrder.changed ||
+        state.enableSourceOrder.changed ||
+        state.proxyTmdb.changed ||
+        state.enableCarouselView.changed ||
+        state.forceCompactEpisodeView.changed ||
+        state.enableLowPerformanceMode.changed
       ) {
         await updateSettings(backendUrl, account, {
           applicationLanguage: state.appLanguage.state,
           applicationTheme: state.theme.state,
           proxyUrls: state.proxyUrls.state?.filter((v) => v !== "") ?? null,
-          febboxKey: state.febboxToken.state,
+          febboxKey: state.febboxKey.state,
+          realDebridKey: state.realDebridKey.state,
+          enableThumbnails: state.enableThumbnails.state,
+          enableAutoplay: state.enableAutoplay.state,
+          enableSkipCredits: state.enableSkipCredits.state,
+          enableDiscover: state.enableDiscover.state,
+          enableFeatured: state.enableFeatured.state,
+          enableDetailsModal: state.enableDetailsModal.state,
+          enableImageLogos: state.enableImageLogos.state,
+          sourceOrder: state.sourceOrder.state,
+          enableSourceOrder: state.enableSourceOrder.state,
+          proxyTmdb: state.proxyTmdb.state,
+          enableCarouselView: state.enableCarouselView.state,
+          forceCompactEpisodeView: state.forceCompactEpisodeView.state,
+          enableLowPerformanceMode: state.enableLowPerformanceMode.state,
         });
       }
       if (state.deviceName.changed) {
@@ -279,15 +344,22 @@ export function SettingsPage() {
     setEnableAutoplay(state.enableAutoplay.state);
     setEnableSkipCredits(state.enableSkipCredits.state);
     setEnableDiscover(state.enableDiscover.state);
+    setEnableFeatured(state.enableFeatured.state);
     setEnableDetailsModal(state.enableDetailsModal.state);
+    setEnableImageLogos(state.enableImageLogos.state);
     setSourceOrder(state.sourceOrder.state);
+    setEnableSourceOrder(state.enableSourceOrder.state);
     setAppLanguage(state.appLanguage.state);
     setTheme(state.theme.state);
     setSubStyling(state.subtitleStyling.state);
     setProxySet(state.proxyUrls.state?.filter((v) => v !== "") ?? null);
     setEnableSourceOrder(state.enableSourceOrder.state);
-    setFebboxToken(state.febboxToken.state);
+    setFebboxKey(state.febboxKey.state);
+    setRealDebridKey(state.realDebridKey.state);
     setProxyTmdb(state.proxyTmdb.state);
+    setEnableCarouselView(state.enableCarouselView.state);
+    setForceCompactEpisodeView(state.forceCompactEpisodeView.state);
+    setEnableLowPerformanceMode(state.enableLowPerformanceMode.state);
 
     if (state.profile.state) {
       updateProfile(state.profile.state);
@@ -308,13 +380,17 @@ export function SettingsPage() {
     account,
     backendUrl,
     setEnableThumbnails,
-    setFebboxToken,
+    setFebboxKey,
+    setRealDebridKey,
     state,
     setEnableAutoplay,
     setEnableSkipCredits,
     setEnableDiscover,
+    setEnableFeatured,
     setEnableDetailsModal,
+    setEnableImageLogos,
     setSourceOrder,
+    setEnableSourceOrder,
     setAppLanguage,
     setTheme,
     setSubStyling,
@@ -323,8 +399,10 @@ export function SettingsPage() {
     updateProfile,
     logout,
     setBackendUrl,
-    setEnableSourceOrder,
     setProxyTmdb,
+    setEnableCarouselView,
+    setForceCompactEpisodeView,
+    setEnableLowPerformanceMode,
   ]);
   return (
     <SubPageLayout>
@@ -373,6 +451,8 @@ export function SettingsPage() {
             setSourceOrder={state.sourceOrder.set}
             enableSourceOrder={state.enableSourceOrder.state}
             setenableSourceOrder={state.enableSourceOrder.set}
+            enableLowPerformanceMode={state.enableLowPerformanceMode.state}
+            setEnableLowPerformanceMode={state.enableLowPerformanceMode.set}
           />
         </div>
         <div id="settings-appearance" className="mt-28">
@@ -382,8 +462,17 @@ export function SettingsPage() {
             setTheme={setThemeWithPreview}
             enableDiscover={state.enableDiscover.state}
             setEnableDiscover={state.enableDiscover.set}
+            enableFeatured={state.enableFeatured.state}
+            setEnableFeatured={state.enableFeatured.set}
             enableDetailsModal={state.enableDetailsModal.state}
             setEnableDetailsModal={state.enableDetailsModal.set}
+            enableImageLogos={state.enableImageLogos.state}
+            setEnableImageLogos={state.enableImageLogos.set}
+            enableCarouselView={state.enableCarouselView.state}
+            setEnableCarouselView={state.enableCarouselView.set}
+            forceCompactEpisodeView={state.forceCompactEpisodeView.state}
+            setForceCompactEpisodeView={state.forceCompactEpisodeView.set}
+            enableLowPerformanceMode={state.enableLowPerformanceMode.state}
           />
         </div>
         <div id="settings-captions" className="mt-28">
@@ -398,8 +487,10 @@ export function SettingsPage() {
             setBackendUrl={state.backendUrl.set}
             proxyUrls={state.proxyUrls.state}
             setProxyUrls={state.proxyUrls.set}
-            febboxToken={state.febboxToken.state}
-            setFebboxToken={state.febboxToken.set}
+            febboxKey={state.febboxKey.state}
+            setFebboxKey={state.febboxKey.set}
+            realDebridKey={state.realDebridKey.state}
+            setRealDebridKey={state.realDebridKey.set}
             proxyTmdb={state.proxyTmdb.state}
             setProxyTmdb={state.proxyTmdb.set}
           />

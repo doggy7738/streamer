@@ -11,7 +11,7 @@ import { useProgressStore } from "@/stores/progress";
 import { shouldShowProgress } from "@/stores/progress/utils";
 import { MediaItem } from "@/utils/mediaTypes";
 
-const LONG_PRESS_DURATION = 500; // 0.5 seconds
+const LONG_PRESS_DURATION = 700; // 0.7 seconds
 
 export function WatchingPart({
   onItemsChange,
@@ -68,8 +68,11 @@ export function WatchingPart({
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Prevent default mouse action
-    pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
+    // Only trigger long press for left mouse button (button 0)
+    if (e.button === 0) {
+      e.preventDefault(); // Prevent default mouse action
+      pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
+    }
   };
 
   const handleMouseUp = () => {

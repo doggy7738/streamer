@@ -4,24 +4,40 @@
         "faqTitle": "Häufig gestellte Fragen",
         "q1": {
             "body": "P-Stream hostet keinen eigenen Inhalt. Wenn du auf etwas zum Anschauen klickst, wird das Internet danach durchsucht (Auf dem Ladebildschirm und im Tab \"Videoquellen\" kannst du einstellen, welche Quellen verwendet werden sollen). P-Stream lädt keine Videos hoch, alleVideos stammen aus der Suche.",
-            "title": "Woher stammen die Videos?"
+            "title": "Woher stammen die Videos?",
+            "section": "allgemein"
         },
         "q2": {
             "body": "Das Anfragen von Serien oder Filmen ist nicht möglich. P-Stream verwaltet keine Inhalte. Alle Videos stammen vom Quellen aus dem Internet.",
-            "title": "Wo kann ich eine Serie oder einen Film anfragen?"
+            "title": "Wo kann ich eine Serie oder einen Film anfragen?",
+            "section": "suchen"
         },
         "q3": {
             "body": "Unsere Suchergebnisse werden von The Movie Database (TMDB) bereitgestellt und, egal ob unsere Videoquellen über dieses Video verfügen, angezeigt.",
-            "title": "Die Suche zeigt eine Serie oder einen Film an, warum kann ich den dann nicht abspielen?"
+            "title": "Die Suche zeigt eine Serie oder einen Film an, warum kann ich den dann nicht abspielen?",
+            "section": "suchen"
         },
         "title": "Über P-Stream",
         "q4": {
             "title": "Was ist mit meinen Daten und dem ganzen Zeug?",
-            "body": "Alle Daten werden mit dem Community-Backend synchronisiert, jeder kann dies ebenfalls nutzen."
+            "body": "Alle Daten werden mit dem Community-Backend synchronisiert, jeder kann dies ebenfalls nutzen.",
+            "section": "allgemein"
         },
         "q5": {
             "title": "Wie kann ich mehr herausfinden?",
-            "body": "P-Stream hat einen Discord-Server, der oben auf der Seite gefunden werden kann!"
+            "body": "P-Stream hat einen Discord-Server, der oben auf der Seite gefunden werden kann!",
+            "section": "allgemein"
+        },
+        "help": "Keine Antwort gefunden? Kontaktiere uns hier.",
+        "sections": {
+            "language": "Sprach- & Untertiteleinstellungen",
+            "general": "Allgemeines",
+            "playback": "Wiedergabeprobleme",
+            "connections": "Verbindungen"
+        },
+        "searchPlaceholder": "FAQ durchsuchen...",
+        "q6": {
+            "title": "Gibt es eine P-Stream App?"
         }
     },
     "actions": {
@@ -94,7 +110,7 @@
         },
         "links": {
             "discord": "Discord",
-            "dmca": "DMCA",
+            "legal": "Legal / DMCA",
             "github": "GitHub",
             "twitter": "Twitter",
             "funding": "Unterstütze uns"
@@ -105,7 +121,7 @@
         "name": "P-Stream",
         "pages": {
             "about": "Über",
-            "dmca": "DMCA",
+            "legal": "Legal / DMCA",
             "login": "Anmelden",
             "onboarding": "Einrichtung",
             "pagetitle": "{{title}} - P-Stream",
@@ -423,7 +439,7 @@
                 "text": "API Metadaten konnten nicht geladen werden, überprüfe deine Netzwerkverbindung.",
                 "title": "API Metadaten konnten nicht geladen werden"
             },
-            "dmca": {
+            "legal": {
                 "badge": "Entfernt",
                 "text": "Das Video ist aufgrund einer Takedown-Anfrage oder eines Urheberrechtsanspruchs nicht mehr verfügbar.",
                 "title": "Video wurde entfernt"
@@ -518,8 +534,8 @@
         }
     },
     "screens": {
-        "dmca": {
-            "title": "DMCA"
+        "legal": {
+            "title": "Legal / DMCA"
         },
         "loadingApp": "Die App wird geladen",
         "loadingUser": "Dein Profil wird geladen",
@@ -808,12 +824,9 @@
         "title": "Jip"
     },
     "details": {
-        "director": "Direktor:",
-        "cast": "Besetzung:",
         "imdb": "Auf IMDb anzeigen",
         "resume": "Fortsetzen",
         "play": "Wiedergeben",
-        "languange": "Sprache:",
         "releaseDate": "Veröffentlichungsdatum:",
         "rating": "Bewertung:",
         "votes": "Stimmen",
@@ -821,5 +834,56 @@
         "episodes": "Folgen",
         "season": "Staffel",
         "runtime": "Laufzeit:"
+    },
+    "discover": {
+        "tabs": {
+            "movies": "Filme",
+            "tvshows": "Serien",
+            "editorpicks": "Empfehlungen der Redaktion"
+        },
+        "carousel": {
+            "title": {
+                "movies": "{{category}} Filme",
+                "tvshows": "{{category}} Serien",
+                "inCinemas": "Im Kino",
+                "popular": "Am beliebtesten",
+                "nowPlaying": "Im Kino",
+                "topRated": "Am besten bewertet",
+                "latestReleases": "Neueste Veröffentlichungen",
+                "4kReleases": "4K-Veröffentlichungen",
+                "onTheAir": "Aktuell im TV",
+                "popularOn": "Beliebte {{type}} auf {{provider}}",
+                "editorPicksMovies": "Redaktionstipps Filme",
+                "editorPicksShows": "Redaktionstipps Serien",
+                "moviesOn": "Filme auf {{provider}}",
+                "tvshowsOn": "Serien auf {{provider}}",
+                "recommended": "Weil du gesehen hast: {{title}}",
+                "genreMovies": "{{genre}} Filme",
+                "genreShows": "{{genre}} Serien",
+                "categoryMovies": "{{category}} Filme",
+                "categoryShows": "{{category}} Serien"
+            },
+            "change": "Ändern",
+            "more": "Mehr anzeigen"
+        },
+        "featured": {
+            "playNow": "Jetzt abspielen",
+            "moreInfo": "Mehr Infos"
+        },
+        "randomMovie": {
+            "button": "Zufälligen Titel abspielen",
+            "cancel": "Countdown abbrechen",
+            "countdown": "{{countdown}}s",
+            "nowPlaying": "Jetzt läuft",
+            "in": "in"
+        },
+        "page": {
+            "title": "Filme & Serien entdecken",
+            "subtitle": "Entdecke aktuelle Highlights und zeitlose Klassiker.",
+            "loadMore": "Mehr laden",
+            "loading": "Lade...",
+            "back": "Zurück"
+        },
+        "scrollToTop": "Nach oben"
     }
 }

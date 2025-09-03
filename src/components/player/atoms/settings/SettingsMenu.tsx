@@ -22,6 +22,9 @@ export function SettingsMenu({ id }: { id: string }) {
   );
   const subtitlesEnabled = useSubtitleStore((s) => s.enabled);
   const currentSourceId = usePlayerStore((s) => s.sourceId);
+  const currentEmbedId = usePlayerStore(
+    (s) => (s as any).embedId as string | null,
+  );
   const sourceName = useMemo(() => {
     if (!currentSourceId) return "...";
     const source = getCachedMetadata().find(
@@ -29,6 +32,11 @@ export function SettingsMenu({ id }: { id: string }) {
     );
     return source?.name ?? "...";
   }, [currentSourceId]);
+  const embedName = useMemo(() => {
+    if (!currentEmbedId) return undefined;
+    const meta = getCachedMetadata().find((s) => s.id === currentEmbedId);
+    return meta?.name;
+  }, [currentEmbedId]);
   const { toggleLastUsed } = useCaptions();
 
   const selectedLanguagePretty = selectedCaptionLanguage
@@ -48,31 +56,65 @@ export function SettingsMenu({ id }: { id: string }) {
 
   return (
     <Menu.Card>
-      <Menu.SectionTitle>
-        {t("player.menus.settings.videoSection")}
-      </Menu.SectionTitle>
-      <Menu.Section>
+      <Menu.Section grid>
         <Menu.ChevronLink
+          box
           onClick={() => router.navigate("/quality")}
           rightText={currentQuality ? qualityToString(currentQuality) : ""}
         >
           {t("player.menus.settings.qualityItem")}
+          <span className="text-type-secondary text-sm">
+            {currentQuality
+              ? qualityToString(currentQuality)
+              : t("player.menus.quality.auto")}
+          </span>
         </Menu.ChevronLink>
-        {currentAudioTrack && (
-          <Menu.ChevronLink
-            onClick={() => router.navigate("/audio")}
-            rightText={selectedAudioLanguagePretty ?? undefined}
-          >
-            {t("player.menus.settings.audioItem")}
-          </Menu.ChevronLink>
-        )}
-
         <Menu.ChevronLink
+          box
           onClick={() => router.navigate("/source")}
           rightText={sourceName}
         >
           {t("player.menus.settings.sourceItem")}
+          <span className="text-type-secondary text-sm">{sourceName}</span>
+          {embedName && (
+            <span className="text-type-secondary text-xs">{embedName}</span>
+          )}
         </Menu.ChevronLink>
+        <Menu.ChevronLink
+          box
+          onClick={() => router.navigate("/captions")}
+          rightText={sourceName}
+        >
+          {t("player.menus.settings.subtitleItem")}
+          <span className="text-type-secondary text-sm">
+            {selectedLanguagePretty ?? t("player.menus.subtitles.offChoice")}
+          </span>
+        </Menu.ChevronLink>
+        {currentAudioTrack ? (
+          <Menu.ChevronLink
+            box
+            onClick={() => router.navigate("/audio")}
+            rightText={selectedAudioLanguagePretty ?? undefined}
+          >
+            {t("player.menus.settings.audioItem")}
+            <span className="text-type-secondary text-sm">
+              {selectedAudioLanguagePretty}
+            </span>
+          </Menu.ChevronLink>
+        ) : (
+          <Menu.ChevronLink
+            box
+            onClick={() => router.navigate("/audio")}
+            disabled
+          >
+            {t("player.menus.settings.audioItem")}
+            <span className="text-type-secondary text-sm">
+              {t("player.menus.audio.default")}
+            </span>
+          </Menu.ChevronLink>
+        )}
+      </Menu.Section>
+      <Menu.Section>
         <Menu.Link
           clickable
           onClick={() =>
@@ -91,13 +133,10 @@ export function SettingsMenu({ id }: { id: string }) {
           rightSide={<Icon className="text-xl" icon={Icons.WATCH_PARTY} />}
           className={downloadable ? "opacity-100" : "opacity-50"}
         >
-          {t("player.menus.watchparty.watchpartyItem")} (Beta)
+          {t("player.menus.watchparty.watchpartyItem")}
         </Menu.Link>
       </Menu.Section>
-
-      <Menu.SectionTitle>
-        {t("player.menus.settings.experienceSection")}
-      </Menu.SectionTitle>
+      <Menu.SectionTitle />
       <Menu.Section>
         <Menu.Link
           rightSide={
@@ -109,12 +148,6 @@ export function SettingsMenu({ id }: { id: string }) {
         >
           {t("player.menus.settings.enableSubtitles")}
         </Menu.Link>
-        <Menu.ChevronLink
-          onClick={() => router.navigate("/captions")}
-          rightText={selectedLanguagePretty ?? undefined}
-        >
-          {t("player.menus.settings.subtitleItem")}
-        </Menu.ChevronLink>
         <Menu.ChevronLink onClick={() => router.navigate("/playback")}>
           {t("player.menus.settings.playbackItem")}
         </Menu.ChevronLink>

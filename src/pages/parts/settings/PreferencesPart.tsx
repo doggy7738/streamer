@@ -27,6 +27,8 @@ export function PreferencesPart(props: {
   setSourceOrder: (v: string[]) => void;
   enableSourceOrder: boolean;
   setenableSourceOrder: (v: boolean) => void;
+  enableLowPerformanceMode: boolean;
+  setEnableLowPerformanceMode: (v: boolean) => void;
 }) {
   const { t } = useTranslation();
   const sorted = sortLangCodes(appLanguageOptions.map((item) => item.code));
@@ -58,6 +60,17 @@ export function PreferencesPart(props: {
 
   const navigate = useNavigate();
 
+  const handleLowPerformanceModeToggle = () => {
+    const newMode = !props.enableLowPerformanceMode;
+    props.setEnableLowPerformanceMode(newMode);
+
+    // When enabling low performance mode, disable bandwidth-heavy features
+    if (newMode) {
+      props.setEnableThumbnails(false);
+      props.setEnableAutoplay(false);
+    }
+  };
+
   return (
     <div className="space-y-12">
       <Heading1 border>{t("settings.preferences.title")}</Heading1>
@@ -73,6 +86,7 @@ export function PreferencesPart(props: {
               {t("settings.preferences.languageDescription")}
             </p>
             <Dropdown
+              className="w-full"
               options={options}
               selectedItem={selected || options[0]}
               setSelectedItem={(opt) => props.setLanguage(opt.id)}
@@ -88,8 +102,17 @@ export function PreferencesPart(props: {
               {t("settings.preferences.thumbnailDescription")}
             </p>
             <div
-              onClick={() => props.setEnableThumbnails(!props.enableThumbnails)}
-              className="bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg"
+              onClick={() => {
+                if (!props.enableLowPerformanceMode) {
+                  props.setEnableThumbnails(!props.enableThumbnails);
+                }
+              }}
+              className={classNames(
+                "bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg",
+                props.enableLowPerformanceMode
+                  ? "cursor-not-allowed opacity-50 pointer-events-none"
+                  : "cursor-pointer opacity-100 pointer-events-auto",
+              )}
             >
               <Toggle enabled={props.enableThumbnails} />
               <p className="flex-1 text-white font-bold">
@@ -108,13 +131,13 @@ export function PreferencesPart(props: {
             </p>
             <div
               onClick={() =>
-                allowAutoplay
+                allowAutoplay && !props.enableLowPerformanceMode
                   ? props.setEnableAutoplay(!props.enableAutoplay)
                   : null
               }
               className={classNames(
                 "bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg",
-                allowAutoplay
+                allowAutoplay && !props.enableLowPerformanceMode
                   ? "cursor-pointer opacity-100 pointer-events-auto"
                   : "cursor-not-allowed opacity-50 pointer-events-none",
               )}
@@ -126,27 +149,47 @@ export function PreferencesPart(props: {
             </div>
 
             {/* Skip End Credits Preference */}
-            {props.enableAutoplay && allowAutoplay && (
-              <div className="pt-4">
-                <p className="text-white font-bold mb-3">
-                  {t("settings.preferences.skipCredits")}
-                </p>
-                <p className="max-w-[25rem] font-medium">
-                  {t("settings.preferences.skipCreditsDescription")}
-                </p>
-                <div
-                  onClick={() =>
-                    props.setEnableSkipCredits(!props.enableSkipCredits)
-                  }
-                  className="bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg"
-                >
-                  <Toggle enabled={props.enableSkipCredits} />
-                  <p className="flex-1 text-white font-bold">
-                    {t("settings.preferences.skipCreditsLabel")}
+            {props.enableAutoplay &&
+              allowAutoplay &&
+              !props.enableLowPerformanceMode && (
+                <div className="pt-4 pl-4 border-l-8 border-dropdown-background">
+                  <p className="text-white font-bold mb-3">
+                    {t("settings.preferences.skipCredits")}
                   </p>
+                  <p className="max-w-[25rem] font-medium">
+                    {t("settings.preferences.skipCreditsDescription")}
+                  </p>
+                  <div
+                    onClick={() =>
+                      props.setEnableSkipCredits(!props.enableSkipCredits)
+                    }
+                    className="bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg"
+                  >
+                    <Toggle enabled={props.enableSkipCredits} />
+                    <p className="flex-1 text-white font-bold">
+                      {t("settings.preferences.skipCreditsLabel")}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+          </div>
+          {/* Low Performance Mode */}
+          <div>
+            <p className="text-white font-bold mb-3">
+              {t("settings.preferences.lowPerformanceMode")}
+            </p>
+            <p className="max-w-[25rem] font-medium">
+              {t("settings.preferences.lowPerformanceModeDescription")}
+            </p>
+            <div
+              onClick={handleLowPerformanceModeToggle}
+              className="bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg"
+            >
+              <Toggle enabled={props.enableLowPerformanceMode} />
+              <p className="flex-1 text-white font-bold">
+                {t("settings.preferences.lowPerformanceModeLabel")}
+              </p>
+            </div>
           </div>
         </div>
 

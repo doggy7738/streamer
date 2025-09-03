@@ -43,7 +43,8 @@ export function useSettingsState(
   deviceName: string,
   proxyUrls: string[] | null,
   backendUrl: string | null,
-  febboxToken: string | null,
+  febboxKey: string | null,
+  realDebridKey: string | null,
   profile:
     | {
         colorA: string;
@@ -54,22 +55,29 @@ export function useSettingsState(
   enableThumbnails: boolean,
   enableAutoplay: boolean,
   enableDiscover: boolean,
+  enableFeatured: boolean,
   enableDetailsModal: boolean,
   sourceOrder: string[],
   enableSourceOrder: boolean,
   proxyTmdb: boolean,
   enableSkipCredits: boolean,
+  enableImageLogos: boolean,
+  enableCarouselView: boolean,
+  forceCompactEpisodeView: boolean,
+  enableLowPerformanceMode: boolean,
 ) {
   const [proxyUrlsState, setProxyUrls, resetProxyUrls, proxyUrlsChanged] =
     useDerived(proxyUrls);
   const [backendUrlState, setBackendUrl, resetBackendUrl, backendUrlChanged] =
     useDerived(backendUrl);
+  const [febboxKeyState, setFebboxKey, resetFebboxKey, febboxKeyChanged] =
+    useDerived(febboxKey);
   const [
-    febboxTokenState,
-    setFebboxToken,
-    resetFebboxToken,
-    febboxTokenChanged,
-  ] = useDerived(febboxToken);
+    realDebridKeyState,
+    setRealDebridKey,
+    resetRealDebridKey,
+    realDebridKeyChanged,
+  ] = useDerived(realDebridKey);
   const [themeState, setTheme, resetTheme, themeChanged] = useDerived(theme);
   const setPreviewTheme = usePreviewThemeStore((s) => s.setPreviewTheme);
   const resetPreviewTheme = useCallback(
@@ -117,11 +125,23 @@ export function useSettingsState(
     enableDiscoverChanged,
   ] = useDerived(enableDiscover);
   const [
+    enableFeaturedState,
+    setEnableFeaturedState,
+    resetEnableFeatured,
+    enableFeaturedChanged,
+  ] = useDerived(enableFeatured);
+  const [
     enableDetailsModalState,
     setEnableDetailsModalState,
     resetEnableDetailsModal,
     enableDetailsModalChanged,
   ] = useDerived(enableDetailsModal);
+  const [
+    enableImageLogosState,
+    setEnableImageLogosState,
+    resetEnableImageLogos,
+    enableImageLogosChanged,
+  ] = useDerived(enableImageLogos);
   const [
     sourceOrderState,
     setSourceOrderState,
@@ -136,6 +156,24 @@ export function useSettingsState(
   ] = useDerived(enableSourceOrder);
   const [proxyTmdbState, setProxyTmdbState, resetProxyTmdb, proxyTmdbChanged] =
     useDerived(proxyTmdb);
+  const [
+    enableCarouselViewState,
+    setEnableCarouselViewState,
+    resetEnableCarouselView,
+    enableCarouselViewChanged,
+  ] = useDerived(enableCarouselView);
+  const [
+    forceCompactEpisodeViewState,
+    setForceCompactEpisodeViewState,
+    resetForceCompactEpisodeView,
+    forceCompactEpisodeViewChanged,
+  ] = useDerived(forceCompactEpisodeView);
+  const [
+    enableLowPerformanceModeState,
+    setEnableLowPerformanceModeState,
+    resetEnableLowPerformanceMode,
+    enableLowPerformanceModeChanged,
+  ] = useDerived(enableLowPerformanceMode);
 
   function reset() {
     resetTheme();
@@ -144,17 +182,23 @@ export function useSettingsState(
     resetSubStyling();
     resetProxyUrls();
     resetBackendUrl();
-    resetFebboxToken();
+    resetFebboxKey();
+    resetRealDebridKey();
     resetDeviceName();
     resetProfile();
     resetEnableThumbnails();
     resetEnableAutoplay();
     resetEnableSkipCredits();
     resetEnableDiscover();
+    resetEnableFeatured();
     resetEnableDetailsModal();
+    resetEnableImageLogos();
     resetSourceOrder();
     resetEnableSourceOrder();
     resetProxyTmdb();
+    resetEnableCarouselView();
+    resetForceCompactEpisodeView();
+    resetEnableLowPerformanceMode();
   }
 
   const changed =
@@ -164,16 +208,22 @@ export function useSettingsState(
     deviceNameChanged ||
     backendUrlChanged ||
     proxyUrlsChanged ||
-    febboxTokenChanged ||
+    febboxKeyChanged ||
+    realDebridKeyChanged ||
     profileChanged ||
     enableThumbnailsChanged ||
     enableAutoplayChanged ||
     enableSkipCreditsChanged ||
     enableDiscoverChanged ||
+    enableFeaturedChanged ||
     enableDetailsModalChanged ||
+    enableImageLogosChanged ||
     sourceOrderChanged ||
     enableSourceOrderChanged ||
-    proxyTmdbChanged;
+    proxyTmdbChanged ||
+    enableCarouselViewChanged ||
+    forceCompactEpisodeViewChanged ||
+    enableLowPerformanceModeChanged;
 
   return {
     reset,
@@ -208,10 +258,15 @@ export function useSettingsState(
       set: setBackendUrl,
       changed: backendUrlChanged,
     },
-    febboxToken: {
-      state: febboxTokenState,
-      set: setFebboxToken,
-      changed: febboxTokenChanged,
+    febboxKey: {
+      state: febboxKeyState,
+      set: setFebboxKey,
+      changed: febboxKeyChanged,
+    },
+    realDebridKey: {
+      state: realDebridKeyState,
+      set: setRealDebridKey,
+      changed: realDebridKeyChanged,
     },
     profile: {
       state: profileState,
@@ -238,10 +293,20 @@ export function useSettingsState(
       set: setEnableDiscoverState,
       changed: enableDiscoverChanged,
     },
+    enableFeatured: {
+      state: enableFeaturedState,
+      set: setEnableFeaturedState,
+      changed: enableFeaturedChanged,
+    },
     enableDetailsModal: {
       state: enableDetailsModalState,
       set: setEnableDetailsModalState,
       changed: enableDetailsModalChanged,
+    },
+    enableImageLogos: {
+      state: enableImageLogosState,
+      set: setEnableImageLogosState,
+      changed: enableImageLogosChanged,
     },
     sourceOrder: {
       state: sourceOrderState,
@@ -257,6 +322,21 @@ export function useSettingsState(
       state: proxyTmdbState,
       set: setProxyTmdbState,
       changed: proxyTmdbChanged,
+    },
+    enableCarouselView: {
+      state: enableCarouselViewState,
+      set: setEnableCarouselViewState,
+      changed: enableCarouselViewChanged,
+    },
+    forceCompactEpisodeView: {
+      state: forceCompactEpisodeViewState,
+      set: setForceCompactEpisodeViewState,
+      changed: forceCompactEpisodeViewChanged,
+    },
+    enableLowPerformanceMode: {
+      state: enableLowPerformanceModeState,
+      set: setEnableLowPerformanceModeState,
+      changed: enableLowPerformanceModeChanged,
     },
   };
 }

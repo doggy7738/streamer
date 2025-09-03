@@ -11,16 +11,20 @@ import {
 
 import { convertLegacyUrl, isLegacyUrl } from "@/backend/metadata/getmeta";
 import { generateQuickSearchMediaUrl } from "@/backend/metadata/tmdb";
+import { NotificationModal } from "@/components/overlays/notificationsModal";
 import { useOnlineListener } from "@/hooks/usePing";
 import { AboutPage } from "@/pages/About";
 import { AdminPage } from "@/pages/admin/AdminPage";
+import { AllBookmarks } from "@/pages/bookmarks/AllBookmarks";
 import VideoTesterView from "@/pages/developer/VideoTesterView";
+import { DiscoverMore } from "@/pages/discover/AllMovieLists";
 import { Discover } from "@/pages/discover/Discover";
-import { DmcaPage } from "@/pages/Dmca";
+import { MoreContent } from "@/pages/discover/MoreContent";
 import MaintenancePage from "@/pages/errors/MaintenancePage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
 import { JipPage } from "@/pages/Jip";
+import { LegalPage, shouldHaveLegalPage } from "@/pages/Legal";
 import { LoginPage } from "@/pages/Login";
 import { MigrationPage } from "@/pages/migration/Migration";
 import { MigrationDirectPage } from "@/pages/migration/MigrationDirect";
@@ -114,6 +118,7 @@ function App() {
   return (
     <Layout>
       <LanguageProvider />
+      <NotificationModal id="notifications" />
       {!showDowntime && (
         <Routes>
           {/* functional routes */}
@@ -162,12 +167,26 @@ function App() {
           />
           <Route path="/migration/upload" element={<MigrationUploadPage />} />
 
-          <Route path="/dmca" element={<DmcaPage />} />
+          {shouldHaveLegalPage() ? (
+            <Route path="/legal" element={<LegalPage />} />
+          ) : null}
           {/* Support page */}
           <Route path="/support" element={<SupportPage />} />
           <Route path="/jip" element={<JipPage />} />
-          {/* Discover page */}
+          {/* Discover pages */}
           <Route path="/discover" element={<Discover />} />
+          <Route
+            path="/discover/more/:contentType/:mediaType"
+            element={<MoreContent />}
+          />
+          <Route
+            path="/discover/more/:contentType/:id/:mediaType"
+            element={<MoreContent />}
+          />
+          <Route path="/discover/more/:category" element={<MoreContent />} />
+          <Route path="/discover/all" element={<DiscoverMore />} />
+          {/* Bookmarks page */}
+          <Route path="/bookmarks" element={<AllBookmarks />} />
           {/* Settings page */}
           <Route
             path="/settings"

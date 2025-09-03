@@ -10,12 +10,6 @@ import { Transition } from "@/components/utils/Transition";
 import { usePlayerStore } from "@/stores/player/store";
 import { SubtitleStyling, useSubtitleStore } from "@/stores/subtitles";
 
-// Clean-up function to remove unwanted subtitle tags
-function cleanSubtitleText(text: string): string {
-  // Remove unwanted tags like \an1, \pos, \i1, etc.
-  return text.replace(/\\[a-zA-Z0-9(),\s\-_]+/g, "").replace(/\}\s*/g, "");
-}
-
 const wordOverrides: Record<string, string> = {
   i: "I",
 };
@@ -42,12 +36,9 @@ export function CaptionCue({
       .replaceAll(/ i'/g, " I'")
       .replaceAll(/\r?\n/g, "<br />");
 
-    // Clean the subtitle text before sanitizing it
-    const cleanedText = cleanSubtitleText(textWithNewlines);
-
     // https://www.w3.org/TR/webvtt1/#dom-construction-rules
     // added a <br /> for newlines
-    const html = sanitize(cleanedText, {
+    const html = sanitize(textWithNewlines, {
       ALLOWED_TAGS: ["c", "b", "i", "u", "span", "ruby", "rt", "br"],
       ADD_TAGS: ["v", "lang"],
       ALLOWED_ATTR: ["title", "lang"],
@@ -84,7 +75,7 @@ export function CaptionCue({
 
   return (
     <p
-      className="pointer-events-none mb-1 select-none rounded px-4 py-1 text-center leading-normal"
+      className="mb-1 rounded px-4 py-1 text-center leading-normal"
       style={{
         color: styling.color,
         fontSize: `${(1.5 * styling.size).toFixed(2)}em`,
@@ -154,7 +145,7 @@ export function SubtitleView(props: { controlsShown: boolean }) {
   if (captionAsTrack || !caption || isCasting) return null;
 
   return (
-    <Transition className="pointer-events-none" animation="slide-up" show>
+    <Transition animation="slide-up" show>
       <div
         className="text-white absolute w-full flex flex-col items-center transition-[bottom]"
         style={{

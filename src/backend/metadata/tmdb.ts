@@ -11,10 +11,13 @@ import { MWMediaMeta, MWMediaType, MWSeasonMeta } from "./types/mw";
 import {
   ExternalIdMovieSearchResult,
   TMDBContentTypes,
+  TMDBCredits,
   TMDBEpisodeShort,
   TMDBMediaResult,
   TMDBMovieData,
   TMDBMovieSearchResult,
+  TMDBPerson,
+  TMDBPersonImages,
   TMDBSearchResult,
   TMDBSeason,
   TMDBSeasonMetaResult,
@@ -245,6 +248,38 @@ export async function multiSearch(
   return results;
 }
 
+export async function searchMovies(
+  query: string,
+): Promise<TMDBMovieSearchResult[]> {
+  const data = await get<{
+    results: TMDBMovieSearchResult[];
+  }>("search/movie", {
+    query,
+    include_adult: false,
+    page: 1,
+  });
+  return data.results.map((result) => ({
+    ...result,
+    media_type: TMDBContentTypes.MOVIE,
+  }));
+}
+
+export async function searchTVShows(
+  query: string,
+): Promise<TMDBShowSearchResult[]> {
+  const data = await get<{
+    results: TMDBShowSearchResult[];
+  }>("search/tv", {
+    query,
+    include_adult: false,
+    page: 1,
+  });
+  return data.results.map((result) => ({
+    ...result,
+    media_type: TMDBContentTypes.TV,
+  }));
+}
+
 export async function generateQuickSearchMediaUrl(
   query: string,
 ): Promise<string | undefined> {
@@ -390,4 +425,83 @@ export function formatTMDBSearchResult(
     original_release_date: new Date(movie.release_date),
     object_type: mediatype,
   };
+}
+
+/**
+ * Fetches the clear logo for a movie or show from TMDB images endpoint.
+ */
+export async function getMediaLogo(
+  id: string,
+  type: TMDBContentTypes,
+  language?: string,
+): Promise<string | undefined> {
+  const userLanguage = language || useLanguageStore.getState().language;
+  const formattedLanguage = getTmdbLanguageCode(userLanguage);
+  const url =
+    type === TMDBContentTypes.MOVIE
+      ? `/movie/${id}/images`
+      : `/tv/${id}/images`;
+  try {
+    const data = await get<any>(url, {
+      include_image_language: `${formattedLanguage},en,null`,
+    });
+    // Try to find a logo in the user's language, then English, then any
+    const logo =
+      data.logos?.find((l: any) => l.iso_639_1 === formattedLanguage) ||
+      data.logos?.find((l: any) => l.iso_639_1 === "en") ||
+      data.logos?.[0];
+    if (logo && logo.file_path) {
+      return `https://image.tmdb.org/t/p/original${logo.file_path}`;
+    }
+    return undefined;
+  } catch (err) {
+    console.error("Failed to fetch TMDB logo:", err);
+    return undefined;
+  }
+}
+
+export async function getMediaCredits(
+  id: string,
+  type: TMDBContentTypes,
+): Promise<TMDBCredits> {
+  const endpoint = type === TMDBContentTypes.MOVIE ? "movie" : "tv";
+  return get<TMDBCredits>(`/${endpoint}/${id}/credits`);
+}
+
+export async function getRelatedMedia(
+  id: string,
+  type: TMDBContentTypes,
+  limit: number = 10,
+): Promise<TMDBMovieSearchResult[] | TMDBShowSearchResult[]> {
+  const endpoint = type === TMDBContentTypes.MOVIE ? "movie" : "tv";
+  const data = await get<{
+    results: TMDBMovieSearchResult[] | TMDBShowSearchResult[];
+  }>(`/${endpoint}/${id}/similar`);
+
+  return data.results.slice(0, limit);
+}
+
+export async function getPersonDetails(id: string): Promise<TMDBPerson> {
+  return get<TMDBPerson>(`/person/${id}`);
+}
+
+export async function getPersonImages(id: string): Promise<TMDBPersonImages> {
+  return get<TMDBPersonImages>(`/person/${id}/images`);
+}
+
+export function getPersonProfileImage(
+  profilePath: string | null,
+): string | undefined {
+  const shouldProxyTmdb = usePreferencesStore.getState().proxyTmdb;
+  const imgUrl = `https://image.tmdb.org/t/p/w185/${profilePath}`;
+
+  if (shouldProxyTmdb) {
+    const proxyUrls = getProxyUrls();
+    const proxy = getNextProxy(proxyUrls);
+    if (proxy) {
+      return `${proxy}/?destination=${imgUrl}`;
+    }
+  }
+
+  if (profilePath) return imgUrl;
 }

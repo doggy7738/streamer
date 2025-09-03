@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { type DragEvent, useRef, useState } from "react";
+import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { convert } from "subsrt-ts";
 
@@ -10,6 +10,7 @@ import { Icon, Icons } from "@/components/Icon";
 import { useCaptions } from "@/components/player/hooks/useCaptions";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
+import { fixUTF8Encoding } from "@/components/player/utils/captions";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { usePlayerStore } from "@/stores/player/store";
 import { useSubtitleStore } from "@/stores/subtitles";
@@ -23,26 +24,120 @@ export function CaptionOption(props: {
   onClick?: () => void;
   error?: React.ReactNode;
   flag?: boolean;
+  subtitleUrl?: string;
+  subtitleType?: string;
+  // subtitle details from wyzie
+  subtitleSource?: string;
+  subtitleEncoding?: string;
+  isHearingImpaired?: boolean;
 }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const tooltipContent = useMemo(() => {
+    if (!props.subtitleUrl && !props.subtitleSource) return null;
+
+    const parts = [];
+
+    if (props.subtitleSource) {
+      parts.push(`Source: ${props.subtitleSource}`);
+    }
+
+    if (props.subtitleEncoding) {
+      parts.push(`Encoding: ${props.subtitleEncoding}`);
+    }
+
+    if (props.isHearingImpaired) {
+      parts.push(`Hearing Impaired: Yes`);
+    }
+
+    if (props.subtitleUrl) {
+      parts.push(`URL: ${props.subtitleUrl}`);
+    }
+
+    return parts.join("\n");
+  }, [
+    props.subtitleUrl,
+    props.subtitleSource,
+    props.subtitleEncoding,
+    props.isHearingImpaired,
+  ]);
+
+  const handleMouseEnter = () => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+    tooltipTimeoutRef.current = setTimeout(() => setShowTooltip(true), 500);
+  };
+
+  const handleMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+    setShowTooltip(false);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <SelectableLink
-      selected={props.selected}
-      loading={props.loading}
-      error={props.error}
-      onClick={props.onClick}
+    <div
+      className="relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <span
-        data-active-link={props.selected ? true : undefined}
-        className="flex items-center"
+      <SelectableLink
+        selected={props.selected}
+        loading={props.loading}
+        error={props.error}
+        onClick={props.onClick}
       >
-        {props.flag ? (
-          <span data-code={props.countryCode} className="mr-3 inline-flex">
-            <FlagIcon langCode={props.countryCode} />
-          </span>
-        ) : null}
-        <span>{props.children}</span>
-      </span>
-    </SelectableLink>
+        <span
+          data-active-link={props.selected ? true : undefined}
+          className="flex items-center"
+        >
+          {props.flag ? (
+            <span data-code={props.countryCode} className="mr-3 inline-flex">
+              <FlagIcon langCode={props.countryCode} />
+            </span>
+          ) : null}
+          <span>{props.children}</span>
+          {props.subtitleType && (
+            <span className="ml-2 px-2 py-0.5 rounded bg-video-context-hoverColor bg-opacity-80 text-video-context-type-main text-xs font-semibold">
+              {props.subtitleType.toUpperCase()}
+            </span>
+          )}
+          {props.subtitleSource && (
+            <span
+              className={classNames(
+                "ml-2 px-2 py-0.5 rounded text-white text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap",
+                {
+                  "bg-blue-500": props.subtitleSource.includes("wyzie"),
+                  "bg-orange-500": props.subtitleSource === "opensubs",
+                  "bg-purple-500": props.subtitleSource === "febbox",
+                },
+              )}
+            >
+              {props.subtitleSource.toUpperCase()}
+            </span>
+          )}
+          {props.isHearingImpaired && (
+            <Icon icon={Icons.EAR} className="ml-2" />
+          )}
+        </span>
+      </SelectableLink>
+      {tooltipContent && showTooltip && (
+        <div className="absolute z-50 left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-black/80 text-white/80 text-xs rounded-lg backdrop-blur-sm w-60 break-all whitespace-pre-line">
+          {tooltipContent}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -70,7 +165,15 @@ export function CustomCaptionOption() {
           reader.addEventListener("load", (event) => {
             if (!event.target || typeof event.target.result !== "string")
               return;
-            const converted = convert(event.target.result, "srt");
+
+            // Ensure the data is in UTF-8 and fix any encoding issues
+            const encoder = new TextEncoder();
+            const decoder = new TextDecoder("utf-8");
+            const utf8Bytes = encoder.encode(event.target.result);
+            const utf8Data = decoder.decode(utf8Bytes);
+            const fixedData = fixUTF8Encoding(utf8Data);
+
+            const converted = convert(fixedData, "srt");
             setCaption({
               language: "custom",
               srtData: converted,
@@ -116,7 +219,14 @@ export function CaptionsView({
     reader.addEventListener("load", (e) => {
       if (!e.target || typeof e.target.result !== "string") return;
 
-      const converted = convert(e.target.result, "srt");
+      // Ensure the data is in UTF-8 and fix any encoding issues
+      const encoder = new TextEncoder();
+      const decoder = new TextDecoder("utf-8");
+      const utf8Bytes = encoder.encode(e.target.result);
+      const utf8Data = decoder.decode(utf8Bytes);
+      const fixedData = fixUTF8Encoding(utf8Data);
+
+      const converted = convert(fixedData, "srt");
 
       setCaption({
         language: "custom",
@@ -125,7 +235,7 @@ export function CaptionsView({
       });
     });
 
-    reader.readAsText(firstFile);
+    reader.readAsText(firstFile, "utf-8");
   }
 
   const selectedLanguagePretty = selectedCaptionLanguage

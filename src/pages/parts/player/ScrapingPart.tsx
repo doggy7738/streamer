@@ -1,4 +1,4 @@
-import { ProviderControls, ScrapeMedia } from "@movie-web/providers";
+import { ProviderControls, ScrapeMedia } from "@p-stream/providers";
 import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -104,8 +104,7 @@ export function ScrapingPart(props: ScrapingProps) {
       ) : null}
       <div
         className={classNames({
-          "absolute transition-[transform,opacity] opacity-0 dir-neutral:left-0":
-            true,
+          "absolute transition-[transform,opacity] opacity-0 dir-neutral:left-0": true,
           "!opacity-100": renderedOnce,
         })}
         ref={listRef}

@@ -94,7 +94,7 @@
         },
         "links": {
             "discord": "Discord",
-            "dmca": "DMCA (νόμος περί πνευματικών δικαιωμάτων)",
+            "legal": "Legal / DMCA (νόμος περί πνευματικών δικαιωμάτων)",
             "github": "GitHub",
             "twitter": "Twitter",
             "funding": "Υποστηρίξτε μας"
@@ -105,7 +105,7 @@
         "name": "P-Stream",
         "pages": {
             "about": "Σχετικά",
-            "dmca": "DMCA (νόμος περί πνευματικών δικαιωμάτων)",
+            "legal": "Legal / DMCA (νόμος περί πνευματικών δικαιωμάτων)",
             "login": "Σύνδεση",
             "pagetitle": "{{title}} - P-Stream",
             "register": "Εγγραφή",
@@ -360,7 +360,7 @@
                 "button": "Χρησιμοποίησε το extension",
                 "title": "Ρύθμισε αυτό το extension"
             },
-            "dmca": {
+            "legal": {
                 "text": "Αυτό το περιεχόμενο δεν είναι πλέον διαθέσιμο εξαιτίας κάποιας παρατήρησης για δικαίωμα πνευματικού περιεχομένου.😨",
                 "badge": "Αφαιρέθηκε",
                 "title": "Το περιεχόμενο έχει αφαιρεθεί"
@@ -443,8 +443,8 @@
         }
     },
     "screens": {
-        "dmca": {
-            "title": "DMCA (νόμος περί πνευματικών δικαιωμάτων)"
+        "legal": {
+            "title": "Legal / DMCA (νόμος περί πνευματικών δικαιωμάτων)"
         },
         "loadingApp": "Φόρτωση εφαρμογής",
         "loadingUser": "Φόρτωση του προφίλ σας",
@@ -661,20 +661,8 @@
                 "tvshows": "{{category}}Σειρές",
                 "inCinemas": "Στα Σινεμά",
                 "popularOn": "Δημοφιλείς{{type}} στο {{provider}}",
-                "editorPicks": "Επιλογές Συντακτών",
                 "movies": "{{category}}Ταινίες"
             }
-        },
-        "providers": {
-            "netflix": "Netflix",
-            "appleTv": "Apple TV+",
-            "hulu": "Hulu",
-            "max": "Max",
-            "disneyPlus": "Disney Plus",
-            "shudder": "Shudder",
-            "fubuTV": "fubuTV",
-            "paramountPlus": "Paramount Plus",
-            "amazonPrime": "Amazon Prime Video"
         },
         "randomMovie": {
             "button": "Παρακολούθησε κάτι τυχαίο",
@@ -895,11 +883,8 @@
     },
     "details": {
         "episodes": "Επεισόδια",
-        "languange": "Γλώσσα:",
         "resume": "Συνεχίστε",
         "play": "Αναπαραγωγή",
-        "director": "Σκηνοθέτης:",
-        "cast": "Ηθοποιοί:",
         "releaseDate": "Ημερομηνία κυκλοφορίας:",
         "rating": "Βαθμολογία:",
         "votes": "Ψήφοι",
@@ -924,7 +909,6 @@
             "showVideo": "Εμφάνιση εκπαιδευτικού βίντεο"
         },
         "status": {
-            "failure": "Αποτυχία λήψης ροής \"VIP\". Το διακριτικό δεν είναι έγκυρο ή το API είναι εκτός λειτουργίας!",
             "success": "επιτυχία"
         },
         "onboarding": {

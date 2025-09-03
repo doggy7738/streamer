@@ -9,6 +9,23 @@ export interface SettingsInput {
   defaultSubtitleLanguage?: string;
   proxyUrls?: string[] | null;
   febboxKey?: string | null;
+  realDebridKey?: string | null;
+  enableThumbnails?: boolean;
+  enableAutoplay?: boolean;
+  enableSkipCredits?: boolean;
+  enableDiscover?: boolean;
+  enableFeatured?: boolean;
+  enableDetailsModal?: boolean;
+  enableImageLogos?: boolean;
+  enableCarouselView?: boolean;
+  forceCompactEpisodeView?: boolean;
+  sourceOrder?: string[];
+  enableSourceOrder?: boolean;
+  embedOrder?: string[];
+  enableEmbedOrder?: boolean;
+  proxyTmdb?: boolean;
+  enableLowPerformanceMode?: boolean;
+  enableNativeSubtitles?: boolean;
 }
 
 export interface SettingsResponse {
@@ -17,6 +34,22 @@ export interface SettingsResponse {
   defaultSubtitleLanguage?: string | null;
   proxyUrls?: string[] | null;
   febboxKey?: string | null;
+  realDebridKey?: string | null;
+  enableThumbnails?: boolean;
+  enableAutoplay?: boolean;
+  enableSkipCredits?: boolean;
+  enableDiscover?: boolean;
+  enableFeatured?: boolean;
+  enableDetailsModal?: boolean;
+  enableImageLogos?: boolean;
+  enableCarouselView?: boolean;
+  sourceOrder?: string[];
+  enableSourceOrder?: boolean;
+  embedOrder?: string[];
+  enableEmbedOrder?: boolean;
+  proxyTmdb?: boolean;
+  enableLowPerformanceMode?: boolean;
+  enableNativeSubtitles?: boolean;
 }
 
 export function updateSettings(
